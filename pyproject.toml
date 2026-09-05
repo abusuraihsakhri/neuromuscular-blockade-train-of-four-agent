@@ -23,5 +23,5 @@ dependencies = []
 neuromuscular-blockade-train-of-four-engine = "neuromuscular_blockade_train_of_four_agent.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-engine"
-Repository = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-engine.git"
+Homepage = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent"
+Repository = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent.git"

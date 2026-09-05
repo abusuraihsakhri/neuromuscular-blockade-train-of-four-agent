@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from agents.base import PHIGuard, AuditLogger, SecurityException
+from agents.base import PHIGuard, AuditLogger, AuditTrail, SecurityException
 from agents.models import SystemTaskPayload, UrgencyLevel, SystemIntegrityStatus
 from agents.workers import InvariantQCWorker, SafetyEscalationWorker, ProtocolConformanceWorker
 from agents.supervisor import SystemSupervisor
@@ -21,6 +21,15 @@ def test_phi_guard_enforcement():
 
     # Clean text passes
     PHIGuard.assert_no_phi("Analytical assay specimen KEY-001 optimal")
+
+
+def test_phi_guard_redaction():
+    """Test that PHI guard can redact sensitive information."""
+    text_with_phi = "Patient John Doe, MRN-123456, phone 555-123-4567"
+    redacted = PHIGuard.redact_phi(text_with_phi)
+    assert "REDACTED_IDENTIFIER" in redacted
+    assert "John Doe" not in redacted
+    assert "MRN-123456" not in redacted
 
 
 def test_specialized_workers():
@@ -63,3 +72,57 @@ def test_supervisor_consensus_and_audit():
     assert main(["audit", "--task-id", "CLI-TEST-01"]) == 0
     assert main(["chat", "Explain", "specifications"]) == 0
     assert main(["verify-audit"]) == 0
+
+
+def test_audit_trail_integrity_verification():
+    """Test that audit trail integrity verification detects tampering."""
+    trail = AuditTrail(secret_key="test-key-for-integrity-verification")
+
+    # Log some entries
+    entry1 = trail.log("test-actor", "test-tier", "TEST_EVENT", {"data": "value1"})
+    entry2 = trail.log("test-actor", "test-tier", "TEST_EVENT", {"data": "value2"})
+
+    # Verify integrity passes for valid trail
+    assert trail.verify_integrity() is True
+
+    # Tamper with an entry
+    trail.logs[0]["payload_hash"] = "tampered_hash"
+
+    # Verify integrity fails after tampering
+    assert trail.verify_integrity() is False
+
+
+def test_audit_trail_chain_linkage():
+    """Test that audit trail chain linkage is properly maintained."""
+    trail = AuditTrail(secret_key="test-key-for-chain-linkage")
+
+    entry1 = trail.log("actor1", "tier1", "EVENT_1", {"a": 1})
+    entry2 = trail.log("actor2", "tier2", "EVENT_2", {"b": 2})
+
+    # Second entry's prev_hash should equal first entry's current_hash
+    assert entry2["prev_hash"] == entry1["current_hash"]
+
+    # First entry's prev_hash should be genesis
+    assert entry1["prev_hash"] == "GENESIS_BLOCK_0000000000000000"
+
+
+def test_batch_missing_input_file():
+    """Test that batch command handles missing input file gracefully."""
+    result = main(["batch", "-i", "nonexistent_file_xyz.csv"])
+    assert result == 1
+
+
+def test_audit_trail_hmac_signature_verification():
+    """Test that HMAC signatures are properly verified."""
+    trail = AuditTrail(secret_key="test-key-for-hmac-verification")
+
+    trail.log("actor", "tier", "EVENT", {"key": "value"})
+
+    # Verify integrity (which now includes HMAC signature verification)
+    assert trail.verify_integrity() is True
+
+    # Tamper with the signature
+    trail.logs[0]["current_hash"] = "invalid_signature"
+
+    # Should fail verification
+    assert trail.verify_integrity() is False
