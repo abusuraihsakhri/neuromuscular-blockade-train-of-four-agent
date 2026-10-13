@@ -1,27 +1,33 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "neuromuscular-blockade-train-of-four-engine"
-version = "2.0.0"
-description = "TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Engine"
+version = "2.0.1"
+description = "Train-of-four monitoring interpretation and legacy audit demonstrations"
 readme = "README.md"
-authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
-license = { text = "MIT" }
+authors = [{name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com"}]
+license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Medical Science Apps.",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 requires-python = ">=3.9"
-dependencies = []
+dependencies = ["pydantic>=2.0,<3"]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.111,<1", "uvicorn>=0.30,<1"]
+test = ["pytest>=7,<10", "httpx>=0.27,<1", "fastapi>=0.111,<1"]
 
 [project.scripts]
 neuromuscular-blockade-train-of-four-engine = "neuromuscular_blockade_train_of_four_agent.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent"
-Repository = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent.git"
+Repository = "https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent"
+
+[tool.setuptools.packages.find]
+include = ["agents*", "neuromuscular_blockade_train_of_four_agent*"]
