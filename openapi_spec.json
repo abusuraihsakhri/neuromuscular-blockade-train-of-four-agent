@@ -1,43 +1,65 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Neuromuscular Blockade Train Of Four Engine API",
-    "description": "Enterprise Distributed Component Platform (Clinical & Cryptographic AI) adhering to CAP / CLSI / NIST Standards.",
-    "version": "3.0.0-ENTERPRISE",
-    "contact": {
-      "name": "Dr. Abu Suraih Sakhri",
-      "url": "https://github.com/abusuraihsakhri"
+    "title": "Legacy generic-metric audit demonstration API",
+    "version": "2.0.1",
+    "description": "This endpoint is not clinically validated. No patient identifiers or treatment decisions. Separate educational /api/tof implementation is available through the optional package server."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000",
+      "description": "Local-only demo server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
     }
   },
   "paths": {
     "/health": {
       "get": {
-        "summary": "Health and metadata check",
+        "summary": "Non-sensitive health check",
         "responses": {
           "200": {
-            "description": "System optimal"
+            "description": "Healthy"
           }
         }
       }
     },
     "/metrics": {
       "get": {
-        "summary": "Prometheus operational metrics",
+        "summary": "Aggregate JSON counters",
         "responses": {
           "200": {
-            "description": "Prometheus text metrics"
+            "description": "Public non-sensitive JSON counters"
           }
         }
       }
     },
     "/api/audit": {
       "post": {
-        "summary": "Dispatch task payload across specialized workers",
+        "summary": "Legacy synthetic audit (not validated)",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "task_id",
+                  "target_identifier",
+                  "primary_metric"
+                ],
                 "properties": {
                   "task_id": {
                     "type": "string"
@@ -57,56 +79,62 @@
                   "is_critical_flag": {
                     "type": "boolean"
                   }
-                },
-                "required": [
-                  "task_id",
-                  "target_identifier",
-                  "primary_metric"
-                ]
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Consensus dossier with HMAC signature"
+            "description": "Unvalidated synthetic dossier"
+          },
+          "401": {
+            "description": "Invalid key"
+          },
+          "503": {
+            "description": "API key missing from server"
           }
         }
       }
     },
     "/api/chat": {
       "post": {
-        "summary": "Air-gapped supervisory conversational assistant",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "query": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "query"
-                ]
-              }
-            }
+        "summary": "Mock demonstration response",
+        "security": [
+          {
+            "ApiKeyAuth": []
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Supervisory response"
+            "description": "Deterministic mock response"
+          },
+          "401": {
+            "description": "Invalid key"
+          },
+          "503": {
+            "description": "API key not configured"
           }
         }
       }
     },
     "/api/audit/logs": {
       "get": {
-        "summary": "Retrieve and cryptographically verify HMAC audit trail",
+        "summary": "Access temporary HMAC audit trail",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Cryptographic audit trail"
+            "description": "In-memory signed events"
+          },
+          "401": {
+            "description": "Invalid key"
+          },
+          "503": {
+            "description": "API key not configured"
           }
         }
       }

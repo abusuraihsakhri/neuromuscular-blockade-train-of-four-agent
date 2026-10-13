@@ -1,7 +1,7 @@
 """
 Clinical Algorithmic Engine & Guideline Rules for TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent.
 Domain: Anesthesiology / ICU
-Standard: ASA Neuromuscular Blockade Guidelines 2023
+Standard: unvalidated generic-metric demonstration
 """
 import math
 from typing import Dict, Any, List, Optional
@@ -9,7 +9,7 @@ from .models import ClinicalCasePayload, AgentAlert, UrgencyLevel, ClinicalInteg
 
 
 class ClinicalDomainEngine:
-    GUIDELINE = "ASA Neuromuscular Blockade Guidelines 2023"
+    GUIDELINE = "unvalidated generic-metric demonstration"
     PRIMARY_BASELINE_LIMIT = 20.0
     SECONDARY_ALERT_LIMIT = 10.0
 
@@ -18,8 +18,8 @@ class ClinicalDomainEngine:
         if value > cls.PRIMARY_BASELINE_LIMIT:
             return {
                 "title": "Primary Metric Threshold Exceeded",
-                "finding": f"Observed value ({value:.2f}) exceeds ASA Neuromuscular Blockade Guidelines 2023 clinical baseline limit ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
-                "recommendation": "Perform immediate secondary verification and calibration review.",
+                "finding": f"Observed value ({value:.2f}) exceeds unvalidated generic-metric demonstration clinical baseline limit ({cls.PRIMARY_BASELINE_LIMIT:.1f}).",
+                "recommendation": "Check the demonstration input; no clinical inference is made.",
             }
         return None
 
@@ -29,7 +29,7 @@ class ClinicalDomainEngine:
             return {
                 "title": "STAT Kinetic Escalation Triggered",
                 "finding": f"Kinetic parameter ({value:.2f}) with STAT={is_stat} requires prioritized supervision.",
-                "recommendation": "Activate closed-loop verbal clinician notification protocol per Joint Commission standards.",
+                "recommendation": "Demo escalation only; use independently validated clinical protocols.",
             }
         return None
 
@@ -40,6 +40,6 @@ class ClinicalDomainEngine:
             return {
                 "title": "Phenotypic / Biomarker Discordance Identified",
                 "finding": f"Status flag '{status_flag}' indicates divergence from standard diagnostic concordance.",
-                "recommendation": f"Order reflex confirmatory testing per ASA Neuromuscular Blockade Guidelines 2023 clinical recommendations.",
+                "recommendation": f"Inspect demo input; this is not a biomarker interpretation.",
             }
         return None

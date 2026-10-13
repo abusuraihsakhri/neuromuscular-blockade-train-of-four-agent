@@ -1,186 +1,72 @@
-# Neuromuscular Blockade Train Of Four Agent
+# Train-of-Four Monitoring Interpreter
 
-> **Domain:** Clinical Decision Support & Biomedical Computing  
-> **Reference Guidelines & Standards:** ASA Neuromuscular Blockade Guidelines 2023, CAP / CLSI / ISO Standards
+Educational software for interpreting measured **train-of-four (TOF) twitch count**, **post-tetanic count (PTC)**, and **quantitative TOF ratio**. The browser interpreter and Python module implement explicit, testable monitoring categories based on the 2023 ASA practice guidelines.
 
-<div align="center">
+> **Educational / research demonstration only.** Not a medical device or clinically validated decision-support system. It does **not** prescribe sugammadex, neostigmine, or other drugs; assess all criteria for extubation; or substitute for direct quantitative neuromuscular monitoring. Do not input identifiable patient data.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
+## Browser application
 
-</div>
+Open [`web/index.html`](web/index.html) locally in a modern browser, or use GitHub Pages **after deployment has been enabled and verified**. No build step, backend, account, or network request is required for evaluation. Enter TOF count (0–4), PTC if count is zero, and measured TOF ratio if count is four. The result may be exported as a JSON file.
 
----
+The browser app does not store inputs, send measurements to a service, or use analytics. The only external links are optional references that open when clicked.
 
-## 📖 What It Does
+## Python CLI
 
-**Neuromuscular Blockade Train Of Four Agent** is an advanced analytical and computational platform implementing Train-of-Four (TOF) Twitch Count & Sugammadex Reversal Agent. It monitors peripheral nerve stimulator twitch counts (0-4/4), post-tetanic counts (PTC), and calculates Sugammadex reversal dosing (2, 4, or 16 mg/kg).
-
----
-
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-### 🔬 Core Algorithmic & Evaluation Engines
-
-- **`Severity`** — dedicated module for severity evaluation and state verification.
-- **`DomainKnowledgeRegistry`**: Enterprise domain rules, guideline matrices, and evidence benchmarks.
-- **`AgentAlert`** — dedicated module for agent alert evaluation and state verification.
-- **`TwitchCountEvaluatorAgent`**: Specialized Sub-Agent 1 for neuromuscular-blockade-train-of-four-agent
-- **`SugammadexDosingAgent`**: Specialized Sub-Agent 2 for neuromuscular-blockade-train-of-four-agent
-- **`NeostigmineGlycoPairingAgent`**: Specialized Sub-Agent 3 for neuromuscular-blockade-train-of-four-agent
-
-### 🛡️ Security & Enterprise Architecture
-
-* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
-
----
-
-## 💻 Installation
+Python 3.10–3.12 is exercised in CI. Python 3.9 is supported by the package metadata.
 
 ```bash
-# Clone the repository
-git clone https://github.com/abusuraihsakhri/neuromuscular-blockade-train-of-four-agent.git
-cd neuromuscular-blockade-train-of-four-agent
-
-# Install dependencies
-pip install -e .
-
-# Optional: Install web server dependencies
-pip install fastapi uvicorn
+python -m pip install -e .
+neuromuscular-blockade-train-of-four-engine tof --count 4 --ratio 0.92
+neuromuscular-blockade-train-of-four-engine tof --count 0 --ptc 2
+neuromuscular-blockade-train-of-four-engine tof --count 2
 ```
 
----
+The direct Python API is `neuromuscular_blockade_train_of_four_agent.tof.interpret_tof(count, ptc=None, ratio=None)`. Invalid or incompatible combinations raise `ValueError`. Missing clinically relevant measurements remain **indeterminate** rather than being inferred.
 
-## 💻 CLI Quickstart & Usage
+| Observations | Educational interpretation |
+|---|---|
+| TOF 0/4; PTC 0 | Complete block |
+| TOF 0/4; PTC ≥1 | Deep block |
+| TOF 1–3/4 | Moderate block |
+| TOF 4/4; quantitative ratio <0.4 | Shallow block |
+| TOF 4/4; ratio 0.4 to <0.9 | Minimal block |
+| TOF 4/4; ratio ≥0.9 | Quantitative recovery threshold met |
+| TOF 0 without PTC, or TOF 4 without ratio | Indeterminate |
 
-### 1. Guided Interactive Mode
-```bash
-python cli.py
-```
+These are monitoring *categories*, not treatment orders. The ASA guideline recommends quantitative monitoring at the **adductor pollicis** and TOF ratio **≥0.9** before extubation, alongside appropriate clinical assessment.
 
-### 2. Direct Parameterized Evaluation
-```bash
-python cli.py --task-id <value> --target <value> --primary <value> --secondary <value>
-```
+## Legacy modules
 
-### Parameter Reference
-- `--task-id`: Specifies input measurement or parameter value.
-- `--target`: Specifies input measurement or parameter value.
-- `--primary`: Specifies input measurement or parameter value.
-- `--secondary`: Specifies input measurement or parameter value.
-- `--critical`: Specifies input measurement or parameter value.
-- `--status`: Specifies input measurement or parameter value.
-- `--input`: Specifies input measurement or parameter value.
-- `--output`: Specifies input measurement or parameter value.
-
-### Input Data Schema
-
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `case_id` | Parameter / observation metric | Required |
-| `patient_synthetic_id` | Parameter / observation metric | Required |
-| `metric_primary` | Parameter / observation metric | Required |
-| `metric_secondary` | Parameter / observation metric | Required |
-| `is_stat` | Parameter / observation metric | Required |
-| `status_flag` | Parameter / observation metric | Required |
-
----
-
-## 🛡️ Security Configuration
-
-### Audit Secret Key
-
-The HMAC-SHA256 audit trail requires a secret key for cryptographic signing. Configure it via environment variable:
+The repository also retains older, separately implemented generic-metric demos: root `cli.py`, `tof_sentinel.py`, `agents/`, `enrichment.py`, and the packaged `audit` / `batch` commands. **Their numeric limits (for example 20, 25, and 12) are synthetic demonstration thresholds, not ASA TOF criteria.** They do not implement reliable medication dosing or clinical escalations. Compatibility is maintained where practical while the verified TOF interpretation is provided separately.
 
 ```bash
-export AUDIT_SECRET_KEY="your-secure-random-key-min-32-chars"
+python -m pip install -e ".[api,test]"
+python -m pytest -q
+node --test web/app.test.mjs
+python cli.py audit --task-id EXAMPLE --primary 12
 ```
 
-**⚠️ Important:** If `AUDIT_SECRET_KEY` is not set, an ephemeral random key will be generated at startup. This means:
-- Audit trail integrity will be maintained within a single session
-- Audit trail will NOT persist across restarts
-- A runtime warning will be emitted
-
-For production deployments, always set a persistent, securely-generated key.
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated test suite:
+## Optional legacy REST API and Docker
 
 ```bash
-pytest -v
+export AUDIT_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+export TOF_API_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(32))')"
+docker compose up --build
 ```
 
-Execute high-throughput batch simulation benchmarks:
+The container binds to `127.0.0.1:8000` by default. `/health` and aggregated `/metrics` are public; `/api/audit`, `/api/chat`, and `/api/audit/logs` require the `X-API-Key` header. Without a configured private key, restricted requests fail closed. The server is a **legacy test interface**, not a clinical service.
 
-```bash
-python simulator.py --tasks 1000 --concurrency 8
-```
+Audit HMAC signatures cover an in-memory chain, **not a durable, independently archived audit record**. The limited pattern-based identifier checks are not comprehensive PHI de-identification or HIPAA compliance. Do not deploy publicly or submit real patient records.
 
----
+## Implementation
 
-## 🐳 Container Deployment
+- Browser: static HTML and ES module; no JavaScript package dependencies.
+- Python: standard-library TOF classifier; optional Pydantic/ FastAPI legacy components.
+- Tests: `pytest`, Node's built-in test runner, CI on Python 3.10–3.12.
+- Deployment: a GitHub Pages workflow publishes the `web/` directory if repository Pages settings permit. The static app does not run Python; no Pyodide is necessary.
 
-### Docker
-```bash
-docker build -t neuromuscular-blockade-train-of-four-agent .
-docker run -p 8000:8000 -e AUDIT_SECRET_KEY="your-secure-key" neuromuscular-blockade-train-of-four-agent
-```
+**Reference:** Thilen SR et al. *2023 American Society of Anesthesiologists Practice Guidelines for Monitoring and Antagonism of Neuromuscular Blockade*. Anesthesiology. 2023;138:13–41. [DOI:10.1097/ALN.0000000000004379](https://doi.org/10.1097/ALN.0000000000004379). [PubMed](https://pubmed.ncbi.nlm.nih.gov/36520073/).
 
-### Docker Compose
-```bash
-# Set your audit key
-export AUDIT_SECRET_KEY="your-secure-production-key"
+## License
 
-# Launch
-docker-compose up -d
-```
-
----
-
-## 📁 Project Structure
-
-```
-neuromuscular-blockade-train-of-four-agent/
-├── agents/                    # Core agent modules
-│   ├── __init__.py
-│   ├── api.py                 # FastAPI REST endpoints
-│   ├── base.py                # Security, PHI guard, audit trail
-│   ├── learning.py            # Bayesian calibration engine
-│   ├── llm_factory.py         # LLM provider factory
-│   ├── metrics.py             # Prometheus metrics collector
-│   ├── models.py              # Pydantic data models
-│   ├── streamer.py            # WebSocket telemetry broadcaster
-│   ├── supervisor.py          # Master coordinator orchestrator
-│   └── workers.py             # Specialized domain workers
-├── tests/                     # Test suite
-│   ├── test_enrichment.py
-│   └── test_neuromuscular_blockade_train_of_four_agent.py
-├── cli.py                     # Main CLI entry point
-├── simulator.py               # High-throughput simulation
-├── enrichment.py              # Feature enrichment engines
-├── tof_sentinel.py            # Alternative TOF implementation
-├── neuromuscular_blockade_train_of_four_agent/  # Secondary package
-├── web/index.html             # Operations console
-├── Dockerfile                 # Container build
-├── docker-compose.yml         # Compose configuration
-├── openapi_spec.json          # OpenAPI 3.1 specification
-├── pyproject.toml             # Project metadata
-└── README.md                  # This file
-```
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+[MIT](LICENSE).

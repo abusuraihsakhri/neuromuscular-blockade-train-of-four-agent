@@ -1,7 +1,2 @@
-"""
-Neuromuscular Blockade Train Of Four Agent — Enterprise Automated Analytical Suite.
-Domain: Clinical & Biomedical AI
-Standard: CAP / CLSI / ISO Standards
-
-"""
-__version__ = "3.0.0-ENTERPRISE"
+"""Legacy generic-metric audit demonstration components; not clinically validated."""
+__version__ = "2.0.1"

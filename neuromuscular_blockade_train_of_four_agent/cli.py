@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from .models import ClinicalCasePayload
 from .agents import TOFCoordinator
+from .tof import interpret_tof
 
 coordinator = TOFCoordinator()
 
@@ -15,6 +16,12 @@ coordinator = TOFCoordinator()
 def main(argv=None):
     parser = argparse.ArgumentParser(prog="neuromuscular-blockade-train-of-four-agent", description="TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # Educational interpretation; independent of legacy generic-metric audits
+    p_tof = subparsers.add_parser("tof", help="Interpret measured TOF data (educational only)")
+    p_tof.add_argument("--count", type=int, required=True)
+    p_tof.add_argument("--ptc", type=int)
+    p_tof.add_argument("--ratio", type=float)
 
     # Audit
     p_audit = subparsers.add_parser("audit", help="Run single case clinical audit")
@@ -40,7 +47,16 @@ def main(argv=None):
 
     args = parser.parse_args(argv)
 
+    if args.command == "tof":
+        try:
+            print(json.dumps(interpret_tof(args.count, args.ptc, args.ratio), indent=2))
+        except ValueError as exc:
+            print(f"Invalid TOF observations: {exc}", file=sys.stderr)
+            return 2
+        return 0
+
     if args.command == "audit":
+        print("DEMONSTRATION ONLY: legacy generic metrics are not validated TOF measurements.", file=sys.stderr)
         case = ClinicalCasePayload(
             case_id=args.case_id,
             patient_synthetic_id="SYNTH-PT-881",
@@ -52,7 +68,7 @@ def main(argv=None):
         dossier = coordinator.process_case(case)
         print("=" * 80)
         print(f"  TOF-SENTINEL: TRAIN-OF-FOUR (TOF) NEUROMUSCULAR BLOCKADE & SUGAMMADEX REVERSAL AGENT")
-        print(f"  Domain: Anesthesiology / ICU | Standard: ASA Neuromuscular Blockade Guidelines 2023")
+        print(f"  Domain: Anesthesiology / ICU | Standard: UNVALIDATED GENERIC-METRIC DEMONSTRATION")
         print(f"  Case: {dossier['case_id']} | Status: [{dossier['overall_status']}] | Total Alerts: {dossier['total_alerts']}")
         print("=" * 80)
         for a in dossier["alerts"]:
@@ -115,6 +131,7 @@ def main(argv=None):
         except OSError as e:
             print(f"Error writing output file: {e}", file=sys.stderr)
             return 1
+        print("DEMONSTRATION ONLY: this batch uses synthetic generic-metric thresholds.", file=sys.stderr)
         print(f"Batch processed {len(out_rows)} records -> {args.output}")
         return 0
 

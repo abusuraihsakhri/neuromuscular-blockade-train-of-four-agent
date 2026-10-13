@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent
-Monitors peripheral nerve stimulator twitch counts (0-4/4), post-tetanic counts (PTC), and calculates Sugammadex reversal (2, 4, or 16 mg/kg).
+Legacy generic-metric demonstration. For TOF interpretation use the package 'tof' command or browser interface.
 
 Domain: Anesthesiology / ICU
 Author: Dr. Abu Suraih Sakhri
@@ -166,9 +166,9 @@ class TOFCoordinator:
         if "summary" in q or "status" in q:
             return f"TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent currently tracking {len(self.case_registry)} cases in local air-gapped memory."
         elif "guidelines" in q or "protocol" in q:
-            return "All sub-agents operate under validated consensus clinical algorithms and CAP/CLSI/NCCN/WHO standards."
+            return "This legacy workflow uses unvalidated generic-metric demonstration rules, not clinical TOF thresholds."
         else:
-            return f"TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent executive agent online. Continuous supervisory monitoring active across all domain parameters."
+            return f"TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent executive agent online. Legacy generic-metric demo; not clinical surveillance."
 
 
 coordinator = TOFCoordinator()
@@ -181,7 +181,7 @@ def create_app():
 
         app = FastAPI(
             title="TOF-Sentinel: Train-of-Four (TOF) Neuromuscular Blockade & Sugammadex Reversal Agent",
-            description="Monitors peripheral nerve stimulator twitch counts (0-4/4), post-tetanic counts (PTC), and calculates Sugammadex reversal (2, 4, or 16 mg/kg).",
+            description="Legacy generic-metric demonstration. For TOF interpretation use the package 'tof' command or browser interface.",
             version="1.0.0",
         )
 
